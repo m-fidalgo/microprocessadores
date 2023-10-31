@@ -5,7 +5,7 @@
 
 ## Sobre
 
-O programa desenvolvido é um aplicativo console que aceita comandos do usuário e para cada comando, desempenha uma certa ação na placa DE2 Altera, usando o programa Altera Monitor.
+O programa desenvolvido é um aplicativo console que aceita comandos do usuário e para cada comando, desempenha uma certa ação na placa DE2 Altera, usando o programa Altera Monitor, a linguagem de montagem do Nios II e os recursos da DE2 Media Computer.
 
 <br />
 
