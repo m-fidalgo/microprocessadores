@@ -1,0 +1,4 @@
+*.elf
+*.s.o
+*.srec
+*.ncf
