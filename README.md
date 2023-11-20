@@ -38,7 +38,7 @@ O programa desenvolvido é um aplicativo console que aceita comandos do usuário
 
 :hourglass_flowing_sand: Cancelar a piscagem do LED
 
-:hourglass_flowing_sand: Cálculo do número triangular e exibição do resultado no display de 7 segmentos
+:heavy_check_mark: Cálculo do número triangular e exibição do resultado no display de 7 segmentos
 
 :hourglass_flowing_sand: Inicializar cronômetro e exibir no display
 
