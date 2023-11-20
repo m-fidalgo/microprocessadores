@@ -9,8 +9,8 @@
 *   - valor de rvalid (indica se o campo data tem caracteres válidos)
 * r11
 *   - auxiliar para verificar o valor lido na uart
-* r12
-*   - número do led
+* r13
+*   - usado para setar o ienable
 */
 
 
@@ -23,6 +23,13 @@ _start:
   START_PROGRAM:
     movia sp, 0x10000
     movia r8, UART_BASE
+
+    ### permitindo interrupções no sistema
+    wrctl	status, r13 # seta o PIE para permitir interrupções
+
+    rdctl r13, ienable # copia o ienable para r13
+    ori r13, r13, 0b1 # seta o IRQ0 como 1 (permitir interrupção do temporizador)
+    wrctl ienable, r13 # escreve no ienable
 
     call WRITE_MESSAGE
 
@@ -51,34 +58,23 @@ _start:
         br ERROR # não é 00 nem 01
 
         SECOND_ZERO_ZERO: # 00xx
-          call READ_WRITEBACK # pega o 1o dígito do número do led (em ASCII)
-
-          # obtendo o valor do 1o dígito * 10 (valor da dezena)
-          slli r12, r2, 3 # multiplica por 8
-          add r12, r12, r2 # soma o valor (r2 * 9)
-          add r12, r12, r2 # soma o valor (r2 * 10) -> valor equivalente em dezena
-
-          call READ_WRITEBACK # pega o 2o dígito do número do led (em ASCII)
-          add r12, r12, r2 # valor da dezena + da unidade
-
-          
-          # TODO: ler mais dois dígitos para ver qual led deve ser ligado
+          call SET_ACTIVE_LED
           br END_LOOP
 
         SECOND_ZERO_ONE: # 01xx
-          call READ_WRITEBACK # pega o 1o dígito do número do led (em ASCII)
+          # call READ_WRITEBACK # pega o 1o dígito do número do led (em ASCII)
 
-          # obtendo o valor do 1o dígito * 10 (valor da dezena)
-          addi r2, r2, -48 # transformando ASCII em int
-          slli r12, r2, 3 # multiplica por 8
-          add r12, r12, r2 # soma o valor (r2 * 9)
-          add r12, r12, r2 # soma o valor (r2 * 10) -> valor equivalente em dezena
+          # # obtendo o valor do 1o dígito * 10 (valor da dezena)
+          # addi r2, r2, -48 # transformando ASCII em int
+          # slli r12, r2, 3 # multiplica por 8
+          # add r12, r12, r2 # soma o valor (r2 * 9)
+          # add r12, r12, r2 # soma o valor (r2 * 10) -> valor equivalente em dezena
 
-          call READ_WRITEBACK # pega o 2o dígito do número do led (em ASCII)
-          addi r2, r2, -48 # transformando ASCII em int
-          add r12, r12, r2 # valor da dezena + da unidade
+          # call READ_WRITEBACK # pega o 2o dígito do número do led (em ASCII)
+          # addi r2, r2, -48 # transformando ASCII em int
+          # add r12, r12, r2 # valor da dezena + da unidade
 
-          # TODO: ler mais dois dígitos para ver qual led deve ser parado
+          # # TODO: ligar o led r12
           br END_LOOP
 
 
@@ -90,7 +86,9 @@ _start:
         br ERROR # não é 10
 
         SECOND_ONE_ZERO: #10
-          # TODO: ler conteúdo das chaves
+
+          call CALC_TRIANGULAR
+          
           br END_LOOP
 
 
@@ -116,5 +114,8 @@ _start:
 
   br START_PROGRAM
 
+.org 0x800
+ACTIVE_LEDS:
+.skip   17*4 # vetor de 17 posições
 
 

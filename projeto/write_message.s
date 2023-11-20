@@ -18,8 +18,9 @@
 .global WRITE_MESSAGE
 WRITE_MESSAGE:
   # prólogo - configurar stack frame
-  addi sp, sp, -28  # stack frame de 28 bytes
-  stw ra, 24(sp)    # guarda o endereço de retorno
+  addi sp, sp, -32  # stack frame de 32 bytes
+  stw ra, 28(sp)    # guarda o endereço de retorno
+  stw r13, 24(sp)		# guardando r13 na stack
   stw r8, 20(sp)   	# guardando r8 na stack
   stw r9, 16(sp)		 	# guardando r9 na stack
   stw r10, 12(sp)		# guardando r10 na stack
@@ -46,14 +47,15 @@ WRITE_MESSAGE:
 
   END_LOOP_WRITE_UART:
     # epílogo - limpar stack frame
-    ldw ra, 24(sp)
+    ldw ra, 28(sp)
+    ldw r13, 24(sp)
     ldw r8, 20(sp)
     ldw r9, 16(sp)
     ldw r10, 12(sp)
     ldw r11, 8(sp)
     ldw r12, 4(sp)
     ldw fp, (sp)
-    addi sp, sp, 28
+    addi sp, sp, 32
     ret
 
 MESSAGE:
