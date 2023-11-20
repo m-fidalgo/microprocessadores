@@ -1,6 +1,8 @@
 /*
 * r2
 *  - valor de retorno de READ_WRITEBACK (valor lido na uart): conteúdo DATA do data register (bits 0 a 7)
+* r3
+*  - usado na RTE para checar quem gerou a interrupção
 * r8
 *   - endereço base da uart (data register)
 * r9
@@ -13,15 +15,53 @@
 *   - usado para setar o ienable
 */
 
-
+.equ STACK, 0x10000 # endereço da pilha
 .equ UART_BASE, 0x10001000 # uart data register
 .equ UART_CONTROL, 0x04 # uart control register offset
+
+.org 0x20
+RTE:
+  # prólogo - configurar stack frame
+  addi sp, sp, -12  # stack frame de 12 bytes
+	stw ra, 8(sp) # guarda o endereço de retorno
+	stw r3, 4(sp) 
+  stw fp, (sp) # guarda o frame pointer
+  mov fp, sp # seta o novo frame pointer
+
+  rdctl et, ipending  # copia o valor de ipending -> saber quem gerou a interrupção
+	beq et, r0, SOFTWARE_EXCEPTIONS # se ipending é 0, a interrupção é de software
+	subi ea, ea, 4 # subtrai 4 do endereço de retorno - regra do nios2
+
+  andi r3, et, 1 # checa se o irq0 (temporizador) gerou a interrupção
+	beq r3, r0, CHECK_IRQ1 # se não foi o irq0, verificar se foi o irq1
+	call EXCEPTION_TEMP # se o irq0 gerou a interrupção, chamar a função para tratá-la
+
+  CHECK_IRQ1:
+    andi r3, et, 2 # checa se o irq1 (push button) gerou a interrupção
+    beq r3, r0, OTHER_INTERRUPTIONS # se não foi o irq1, lidar com outras interrupções
+    # call EXCEPTION_PUSH_BUTTON # se o irq1 gerou a interrupção, chamar a função para tratá-la
+    br END_RTE
+
+  OTHER_INTERRUPTIONS:
+		# lidar com outras interrupções
+		br END_RTE
+
+  SOFTWARE_EXCEPTIONS:
+    # lidar com exceções de software
+
+  END_RTE:
+    # epílogo - limpar stack frame
+    ldw ra, 8(sp)
+    ldw r3, 4(sp)
+    ldw fp, (sp)
+    addi sp, sp, 12
+    eret # retorna da exceção
 
 
 .global _start
 _start:
   START_PROGRAM:
-    movia sp, 0x10000
+    movia sp, STACK
     movia r8, UART_BASE
 
     ### permitindo interrupções no sistema
@@ -62,19 +102,7 @@ _start:
           br END_LOOP
 
         SECOND_ZERO_ONE: # 01xx
-          # call READ_WRITEBACK # pega o 1o dígito do número do led (em ASCII)
-
-          # # obtendo o valor do 1o dígito * 10 (valor da dezena)
-          # addi r2, r2, -48 # transformando ASCII em int
-          # slli r12, r2, 3 # multiplica por 8
-          # add r12, r12, r2 # soma o valor (r2 * 9)
-          # add r12, r12, r2 # soma o valor (r2 * 10) -> valor equivalente em dezena
-
-          # call READ_WRITEBACK # pega o 2o dígito do número do led (em ASCII)
-          # addi r2, r2, -48 # transformando ASCII em int
-          # add r12, r12, r2 # valor da dezena + da unidade
-
-          # # TODO: ligar o led r12
+          call REMOVE_ACTIVE_LED
           br END_LOOP
 
 

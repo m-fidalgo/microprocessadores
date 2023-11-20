@@ -33,7 +33,7 @@ SET_ACTIVE_LED:
 
   movia r13, ACTIVE_LEDS_BASE
   movi r14, 1
-  movi r17, 17
+  movi r17, 17 # tamanho do vetor de leds ativos
 
   call READ_WRITEBACK # pega o 1o dígito do número do led (em ASCII)
 
