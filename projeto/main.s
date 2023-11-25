@@ -3,6 +3,12 @@
 *  - valor de retorno de READ_WRITEBACK (valor lido na uart): conteúdo DATA do data register (bits 0 a 7)
 * r3
 *  - usado na RTE para checar quem gerou a interrupção
+* r4
+*  - indica se a próxima interrupção é de 0,5 (0) ou 1 (1) segundo
+* r5
+*  - indica se a interrupção do led está ativa (1) ou não (0)
+* r6
+*  - indica se a interrupção do cronômetro está ativa (1) ou não (0)
 * r8
 *   - endereço base da uart (data register)
 * r9
@@ -34,12 +40,31 @@ RTE:
 
   andi r3, et, 1 # checa se o irq0 (temporizador) gerou a interrupção
 	beq r3, r0, CHECK_IRQ1 # se não foi o irq0, verificar se foi o irq1
-	call EXCEPTION_TEMP # se o irq0 gerou a interrupção, chamar a função para tratá-la
+  
+  # checando exceções do temporizador
+  CHECK_IRQ0:
+    beq r5, r0, CHECK_TIMER # se não há interrupções do led, checa do cronômetro
+    call EXCEPTION_TEMP_LED # exceção do led
+
+    CHECK_TIMER:
+      beq r4, r0, END_CHECK_IRQ0 # se a interrupção é de 0,5s sai da RTE
+      beq r6, r0, END_CHECK_IRQ0 # se não há interrupções do cronômetro, sai da RTE
+      call EXCEPTION_TEMP_TIMER # exceção do cronômetro
+
+    END_CHECK_IRQ0:
+      beq r4, r0, SET_1S # se r4 = 0 (interrupção era de 0,5s), fala que a próxima é de 1s
+      movi r4, 0 # a interrupção era de 1s, então a próxima é de 0,5s
+      br END_RTE
+
+      SET_1S:
+        movi r4, 1 # fala que a próxima interrupção é de 1s
+        br END_RTE
+      
 
   CHECK_IRQ1:
     andi r3, et, 2 # checa se o irq1 (push button) gerou a interrupção
     beq r3, r0, OTHER_INTERRUPTIONS # se não foi o irq1, lidar com outras interrupções
-    # call EXCEPTION_PUSH_BUTTON # se o irq1 gerou a interrupção, chamar a função para tratá-la
+    call EXCEPTION_PUSH_BUTTON # se o irq1 gerou a interrupção, chamar a função para tratá-la
     br END_RTE
 
   OTHER_INTERRUPTIONS:
@@ -68,7 +93,7 @@ _start:
     wrctl	status, r13 # seta o PIE para permitir interrupções
 
     rdctl r13, ienable # copia o ienable para r13
-    ori r13, r13, 0b1 # seta o IRQ0 como 1 (permitir interrupção do temporizador)
+    ori r13, r13, 0b11 # seta o IRQ0 e IRQ1 como 1 (permitir interrupção do temporizador e push button)
     wrctl ienable, r13 # escreve no ienable
 
     call WRITE_MESSAGE
@@ -114,9 +139,7 @@ _start:
         br ERROR # não é 10
 
         SECOND_ONE_ZERO: #10
-
           call CALC_TRIANGULAR
-          
           br END_LOOP
 
 
@@ -131,11 +154,11 @@ _start:
         br ERROR # não é 20 nem 21
 
         SECOND_TWO_ZERO: #20
-          # TODO: iniciar cronômetro
+          call START_TIMER
           br END_LOOP
 
         SECOND_TWO_ONE: #21
-          # TODO: parar cronômetro
+          call STOP_TIMER
           br END_LOOP
 
       END_LOOP:
@@ -144,6 +167,6 @@ _start:
 
 .org 0x800
 ACTIVE_LEDS:
-.skip   17*4 # vetor de 17 posições
+.skip   18*4 # vetor de 17 posições
 
 

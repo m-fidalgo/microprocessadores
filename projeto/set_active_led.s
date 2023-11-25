@@ -1,6 +1,10 @@
 /*
 * r2
 *  - valor de retorno de READ_WRITEBACK (valor lido na uart): conteúdo DATA do data register (bits 0 a 7)
+* r5
+*  - indica se a interrupção do led está ativa (1) ou não (0)
+* r6
+*  - indica se a interrupção do cronômetro está ativa (1) ou não (0)
 * r12
 *   - número do led
 * r13
@@ -12,7 +16,7 @@
 * r16
 *   - valor do active_led[i]
 * r17
-*  - 17 - tamanho do vetor active leds
+*  - 18 - tamanho do vetor active leds
 */
 
 .equ ACTIVE_LEDS_BASE, 0x800 # endereço inicial do vetor active leds
@@ -33,7 +37,7 @@ SET_ACTIVE_LED:
 
   movia r13, ACTIVE_LEDS_BASE
   movi r14, 1
-  movi r17, 17 # tamanho do vetor de leds ativos
+  movi r17, 18 # tamanho do vetor de leds ativos
 
   call READ_WRITEBACK # pega o 1o dígito do número do led (em ASCII)
 
@@ -50,17 +54,18 @@ SET_ACTIVE_LED:
   LOOP_CHECK_ACTIVE_LEDS:
     add r16, r15, r13 # endereço de active_led[i]
     ldb r16, 0(r16) # pega o valor de active_led[i]
-    beq r16, r14, FOUND_ACTIVE_LED # sai do loop se há led ativo
+    beq r16, r14, SET_LED # sai do loop se há led ativo
 
     addi r15, r15, 1 # incrementa o contador
     beq r15, r17, NO_ACTIVE_LED
     br LOOP_CHECK_ACTIVE_LEDS
 
-  NO_ACTIVE_LED:
-    # não há leds ativos -> configura o temporizador
+  NO_ACTIVE_LED: # não há leds ativos -> configura o temporizador se necessário
+    movi r5, 1 # indica que agora a interrupção dos leds está ativa
+    bne r6, r0, SET_LED # se a interrupção do cronômetro está ativa não configura o led
     call START_TEMP_COUNTER
 
-  FOUND_ACTIVE_LED:
+  SET_LED:
 
   ## setando o led escolhido como ativo no vetor
   slli r12, r12, 2 # multiplica por 4 = offset do led selecionado

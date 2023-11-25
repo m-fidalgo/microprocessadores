@@ -34,9 +34,9 @@ O programa desenvolvido é um aplicativo console que aceita comandos do usuário
 
 :heavy_check_mark: Identificação dos diferentes comandos
 
-:hourglass_flowing_sand: Piscar o LED vermelho com uso do temporizador
+:heavy_check_mark: Piscar o LED vermelho com uso do temporizador
 
-:hourglass_flowing_sand: Cancelar a piscagem do LED
+:heavy_check_mark: Cancelar a piscagem do LED
 
 :heavy_check_mark: Cálculo do número triangular e exibição do resultado no display de 7 segmentos
 

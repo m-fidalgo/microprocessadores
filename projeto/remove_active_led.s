@@ -1,6 +1,10 @@
 /*
 * r2
 *  - valor de retorno de READ_WRITEBACK (valor lido na uart): conteúdo DATA do data register (bits 0 a 7)
+* r5
+*  - indica se a interrupção do led está ativa (1) ou não (0)
+* r6
+*  - indica se a interrupção do cronômetro está ativa (1) ou não (0)
 * r12
 *   - número do led
 * r13
@@ -9,6 +13,8 @@
 *   - 1 - valor do LED ativo no vetor
 * r15
 *   - contador do loop para checar se há leds ativos
+*   - endereço base do registrador control do temporizador
+*   - endereço base do red led base
 * r16
 *   - valor do active_led[i]
 * r17
@@ -16,6 +22,8 @@
 */
 
 .equ ACTIVE_LEDS_BASE, 0x800 # endereço inicial do vetor active leds
+.equ TEMP_CONTROL_REGISTER_BASE, 0x10002004 # control do temporizador
+.equ RED_LED_BASE, 0x10000000 # endereço base dos leds
 
 .global REMOVE_ACTIVE_LED
 REMOVE_ACTIVE_LED:
@@ -62,8 +70,16 @@ REMOVE_ACTIVE_LED:
     br LOOP_ACTIVE_LEDS
 
   EMPTY_VECTOR:
-    # não há leds ativos -> limpa o temporizador
-    # todo: limpar o temporizador
+    movi r5, 0 # não há mais interrupções do led
+  
+    movia r15, RED_LED_BASE
+    stwio r0, 0(r15) # desliga todos os leds
+
+    bne r6, r0, EXIT_REMOVE_LED # se há interrupções do cronômetro, não faz nada
+
+    # não há leds ativos e não há interrupção do cronômetro: limpa o temporizador
+    movia r15, TEMP_CONTROL_REGISTER_BASE
+    stwio r0, 0(r15)
 
   EXIT_REMOVE_LED:
     # epílogo - limpar stack frame
