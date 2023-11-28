@@ -33,9 +33,9 @@ CALC_TRIANGULAR:
   stw r13, 24(sp)
   stw r12, 20(sp)
   stw r11, 16(sp)
-  stw r10, 12(sp)   	# guardando r8 na stack
-  stw r9, 8(sp)   	# guardando r8 na stack
-  stw r8, 4(sp)   	# guardando r8 na stack
+  stw r10, 12(sp)   
+  stw r9, 8(sp)   	
+  stw r8, 4(sp)   	
   stw fp, (sp)     	# guarda o frame pointer
   mov fp, sp       	# seta o novo frame pointer
 
