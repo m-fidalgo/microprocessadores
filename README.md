@@ -40,6 +40,6 @@ O programa desenvolvido é um aplicativo console que aceita comandos do usuário
 
 :heavy_check_mark: Cálculo do número triangular e exibição do resultado no display de 7 segmentos
 
-:hourglass_flowing_sand: Inicializar cronômetro e exibir no display
+:heavy_check_mark: Inicializar cronômetro e exibir no display
 
-:hourglass_flowing_sand: Uso do KEY1 para controlar o cronômetro
+:heavy_check_mark: Uso do KEY1 para controlar o cronômetro

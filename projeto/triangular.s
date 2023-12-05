@@ -50,6 +50,18 @@ CALC_TRIANGULAR:
 
 
   mov r13, r0 # inicia acumulador com 0
+
+  # limpar todos os diplays
+  stbio r0, 0(r12)
+  stbio r0, 1(r12)
+  stbio r0, 2(r12)
+  stbio r0, 3(r12)
+
+  stbio r0, 0(r17)
+  stbio r0, 1(r17)
+  stbio r0, 2(r17)
+  stbio r0, 3(r17)
+
   movi r8, 1 # registrador para ficar vendo se o r9 lido pelo switch vai ser igual a 1
 
   LOOP_TRIANGULAR:

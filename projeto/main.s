@@ -54,11 +54,11 @@ RTE:
     END_CHECK_IRQ0:
       beq r4, r0, SET_1S # se r4 = 0 (interrupção era de 0,5s), fala que a próxima é de 1s
       movi r4, 0 # a interrupção era de 1s, então a próxima é de 0,5s
-      br END_RTE
+      br CHECK_IRQ1
 
       SET_1S:
         movi r4, 1 # fala que a próxima interrupção é de 1s
-        br END_RTE
+        br CHECK_IRQ1
       
 
   CHECK_IRQ1:
@@ -85,17 +85,22 @@ RTE:
 
 .global _start
 _start:
+
+  movia sp, STACK
+  movia r8, UART_BASE
+  mov r4, r0
+  mov r5, r0
+  mov r6, r0
+  mov r7, r0
+  movi r13, 1
+
+  ### permitindo interrupções no sistema
+  wrctl	status, r13 # seta o PIE para permitir interrupções
+
+  movi r13, 0b11 # seta o IRQ0 e IRQ1 como 1 (permitir interrupção do temporizador e push button)
+  wrctl ienable, r13 # escreve no ienable
+
   START_PROGRAM:
-    movia sp, STACK
-    movia r8, UART_BASE
-
-    ### permitindo interrupções no sistema
-    wrctl	status, r13 # seta o PIE para permitir interrupções
-
-    rdctl r13, ienable # copia o ienable para r13
-    ori r13, r13, 0b11 # seta o IRQ0 e IRQ1 como 1 (permitir interrupção do temporizador e push button)
-    wrctl ienable, r13 # escreve no ienable
-
     call WRITE_MESSAGE
 
     LOOP_READ_UART:
@@ -165,8 +170,11 @@ _start:
 
   br START_PROGRAM
 
+
 .org 0x800
 ACTIVE_LEDS:
-.skip   18*4 # vetor de 17 posições
+.skip   18*4 # vetor de 18 posições
 
-
+.org 0x900
+TIMER_COUNTER: # contador (segundos) para o temporizador
+.skip 4*4

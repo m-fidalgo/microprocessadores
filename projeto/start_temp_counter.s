@@ -26,7 +26,7 @@ START_TEMP_COUNTER:
   mov fp, sp       	# seta o novo frame pointer
 
   movia r15, TEMP_CONTROL_REGISTER_BASE
-  movi r4, r0 # a próxima interrupção será de 0,5s
+  mov r4, r0 # a próxima interrupção será de 0,5s
 
   ### configurando o temporizador
   # pegando o valor de ciclos e dividindo na parte alta e baixa (valor mt alto)
@@ -47,5 +47,4 @@ START_TEMP_COUNTER:
   ldw r15, 4(sp)
   ldw fp, (sp)
   addi sp, sp, 20
-
   ret

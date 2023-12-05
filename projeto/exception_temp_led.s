@@ -26,8 +26,9 @@
 .global EXCEPTION_TEMP_LED
 EXCEPTION_TEMP_LED:
   # prólogo - configurar stack frame
-  addi sp, sp, -40  # stack frame de 32 bytes
-  stw ra, 36(sp)    # guarda o endereço de retorno
+  addi sp, sp, -44  # stack frame de 32 bytes
+  stw ra, 40(sp)    # guarda o endereço de retorno
+  stw r20, 36(sp)
   stw r12, 32(sp)
   stw r13, 28(sp)
   stw r14, 24(sp)
@@ -71,7 +72,8 @@ EXCEPTION_TEMP_LED:
     stwio r0, 0(r12)  # seta o valor de TO no registrador status do temporizador
 
     # epílogo - limpar stack frame
-    ldw ra, 36(sp)
+    ldw ra, 40(sp)
+    ldw r20, 36(sp)
     ldw r12, 32(sp)
     ldw r13, 28(sp)
     ldw r14, 24(sp)
@@ -81,5 +83,5 @@ EXCEPTION_TEMP_LED:
     ldw r18, 8(sp)
     ldw r19, 4(sp)
     ldw fp, (sp)
-    addi sp, sp, 40
+    addi sp, sp, 44
     ret
