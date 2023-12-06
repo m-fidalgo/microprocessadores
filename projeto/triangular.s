@@ -22,10 +22,9 @@
 
 .global CALC_TRIANGULAR
 CALC_TRIANGULAR:
-
-# prólogo - configurar stack frame
-  addi sp, sp, -48  # stack frame de 28 bytes
-  stw ra, 44(sp)    # guarda o endereço de retorno
+  # prólogo - configurar stack frame
+  addi sp, sp, -48 # stack frame de 48 bytes
+  stw ra, 44(sp) # guarda o endereço de retorno
   stw r17, 40(sp)
   stw r16, 36(sp)
   stw r15, 32(sp)
@@ -36,8 +35,8 @@ CALC_TRIANGULAR:
   stw r10, 12(sp)   
   stw r9, 8(sp)   	
   stw r8, 4(sp)   	
-  stw fp, (sp)     	# guarda o frame pointer
-  mov fp, sp       	# seta o novo frame pointer
+  stw fp, (sp) # guarda o frame pointer
+  mov fp, sp # seta o novo frame pointer
 
   movia r8, SWITCH_BASE
   movia r11, SEG_LIST
@@ -45,7 +44,7 @@ CALC_TRIANGULAR:
   movia r17, DISPLAY_7_SEG_BASE2
 
   
-  ldwio r9, 0(r8)   # pega valor do switch
+  ldwio r9, 0(r8) # pega valor do switch
   andi r9, r9, 0xFF # aplica máscara para pegar os 8 primeiros
 
 
@@ -79,31 +78,31 @@ CALC_TRIANGULAR:
     # r14 = resultado da divisao
     # r15 = resto da divisao
 
-     mov r14, r13 # inicializo o r14 com o valor
-     movi r16, 0
+    mov r14, r13 # inicializo o r14 com o valor
+    movi r16, 0
 
-     LOOP_DISPLAY: # a ideia eh montar um loop para exibir cada numero
-       beq r14, r0, EXIT_LOOP_DISPLAY # se o resultado da divisao for 0, para o loop
-    
-       div r16, r14, r8 # calcula o resultado da divisao (r14/10)
-       mul r15, r16, r8
-       sub r15, r14, r15 # pega o resto
-       
-       mov r14, r16
-       movi r16, 4 # (comparar r10 sendo maior ou igual a 4 para pegar DISPLAY_7_SEG_BASE1 ou DISPLAY_7_SEG_BASE2 )
+    LOOP_DISPLAY: # a ideia eh montar um loop para exibir cada numero
+      beq r14, r0, EXIT_LOOP_DISPLAY # se o resultado da divisao for 0, para o loop
+  
+      div r16, r14, r8 # calcula o resultado da divisao (r14/10)
+      mul r15, r16, r8
+      sub r15, r14, r15 # pega o resto
+      
+      mov r14, r16
+      movi r16, 4 # (comparar r10 sendo maior ou igual a 4 para pegar DISPLAY_7_SEG_BASE1 ou DISPLAY_7_SEG_BASE2 )
 
-       #Xo dígito
-       add r9, r15, r11 # pega o endereço do item na lista
-       ldbio r9, 0(r9) # valor correspondente da tabela
+      #Xo dígito
+      add r9, r15, r11 # pega o endereço do item na lista
+      ldbio r9, 0(r9) # valor correspondente da tabela
 
-       bge r10, r16, SET_BASE_DISPLAY2
-       
-       add r13, r10, r12 # calculo o endereço dinamico da tabela, r12 é a base do 7seg
-       stb r9, 0(r13) # define o valor de HEX0 como o valor obtido da tabela
-       addi r10, r10, 1
-       br LOOP_DISPLAY
+      bge r10, r16, SET_BASE_DISPLAY2
+      
+      add r13, r10, r12 # calculo o endereço dinamico da tabela, r12 é a base do 7seg
+      stb r9, 0(r13) # define o valor de HEX0 como o valor obtido da tabela
+      addi r10, r10, 1
+      br LOOP_DISPLAY
 
-       SET_BASE_DISPLAY2:
+      SET_BASE_DISPLAY2:
         subi r16, r10, 4
         add r13, r16, r17
         stb r9, 0(r13)
@@ -111,22 +110,20 @@ CALC_TRIANGULAR:
         br LOOP_DISPLAY
 
     EXIT_LOOP_DISPLAY:
-
-	  END_READ_WRITEBACK:
-    # epílogo - limpar stack frame
-    ldw ra, 44(sp)
-    ldw r17, 40(sp)
-    ldw r16, 36(sp)  
-    ldw r15, 32(sp)
-    ldw r14, 28(sp)
-    ldw r13, 24(sp)
-    ldw r12, 20(sp)
-    ldw r11, 16(sp)
-    ldw r10, 12(sp)   	# guardando r8 na stack
-    ldw r9, 8(sp)   	# guardando r8 na stack
-    ldw r8, 4(sp)
-    ldw fp, (sp)
-    addi sp, sp, 48
+      # epílogo - limpar stack frame
+      ldw ra, 44(sp)
+      ldw r17, 40(sp)
+      ldw r16, 36(sp)  
+      ldw r15, 32(sp)
+      ldw r14, 28(sp)
+      ldw r13, 24(sp)
+      ldw r12, 20(sp)
+      ldw r11, 16(sp)
+      ldw r10, 12(sp)
+      ldw r9, 8(sp)
+      ldw r8, 4(sp)
+      ldw fp, (sp)
+      addi sp, sp, 48
     ret
 
 SEG_LIST:
