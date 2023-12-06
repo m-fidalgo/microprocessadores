@@ -12,7 +12,7 @@
 * r12
 *   - endereco dos displays
 * r13
-*   - valor triangular http://www.osfantasticosnumerosprimos.com.br/014-008-calculadora-ordem-posicao-numero-triangular.html
+*   - valor triangular http://www.osfantasticosnumerosprimos.com.br/014-008-calculadora-ordem-posicao-numero-triangular.html  url para calcular
 */
 
 .equ SWITCH_BASE, 0x10000040
