@@ -15,7 +15,7 @@
 .global START_TIMER
 START_TIMER:
   # prólogo - configurar stack frame
-  addi sp, sp, -20  # stack frame de 12 bytes
+  addi sp, sp, -20 # stack frame de 20 bytes
 	stw ra, 16(sp) # guarda o endereço de retorno
 	stw r14, 12(sp) 
 	stw r13, 8(sp) 

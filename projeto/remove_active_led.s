@@ -28,16 +28,16 @@
 .global REMOVE_ACTIVE_LED
 REMOVE_ACTIVE_LED:
   # prólogo - configurar stack frame
-  addi sp, sp, -32  # stack frame de 32 bytes
-  stw ra, 28(sp)    # guarda o endereço de retorno
+  addi sp, sp, -32 # stack frame de 32 bytes
+  stw ra, 28(sp) # guarda o endereço de retorno
   stw r12, 24(sp)	
   stw r13, 20(sp)  
   stw r14, 16(sp)	
   stw r15, 12(sp)
   stw r16, 8(sp)
   stw r17, 4(sp)
-  stw fp, (sp)     	# guarda o frame pointer
-  mov fp, sp       	# seta o novo frame pointer
+  stw fp, (sp) # guarda o frame pointer
+  mov fp, sp	# seta o novo frame pointer
 
   movia r13, ACTIVE_LEDS_BASE
   movi r14, 1

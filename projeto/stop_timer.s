@@ -15,21 +15,20 @@
 .global STOP_TIMER
 STOP_TIMER:
 	# prólogo - configurar stack frame
-    addi sp, sp, -20  
+  addi sp, sp, -20  
 	stw ra, 16(sp) # guarda o endereço de retorno
 	stw r12, 12(sp)
 	stw r13, 8(sp)
 	stw r14, 4(sp)
-    stw fp, (sp) # guarda o frame pointer
-    mov fp, sp # seta o novo frame pointer
+	stw fp, (sp) # guarda o frame pointer
+	mov fp, sp # seta o novo frame pointer
 
 	
 	movia r13, DISPLAY_7_SEG_BASE1
 	movia r14, DISPLAY_7_SEG_BASE2
 	mov r6, r0 # não há interrupções de timer
 
-	# todo: limpar display de 7 segmentos
-	# limpar todos os diplays
+	# limpar todos os diplays de 7 segmentos
 	stbio r0, 0(r13)
 	stbio r0, 1(r13)
 	stbio r0, 2(r13)
@@ -44,7 +43,7 @@ STOP_TIMER:
 
 	# se não há interrupção do led, limpa o temporizador
 	movia r12, TEMP_CONTROL_REGISTER_BASE
- 	stwio r0, 0(r12)
+	stwio r0, 0(r12)
 
 	EXIT_STOP_TIMER:
 		# epílogo - limpar stack frame

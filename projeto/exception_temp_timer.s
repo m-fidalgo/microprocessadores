@@ -16,8 +16,8 @@
 .global EXCEPTION_TEMP_TIMER
 EXCEPTION_TEMP_TIMER:
   # prólogo - configurar stack frame
-  addi sp, sp, -48  # stack frame de 28 bytes
-  stw ra, 44(sp)    # guarda o endereço de retorno
+  addi sp, sp, -48 # stack frame de 48 bytes
+  stw ra, 44(sp) # guarda o endereço de retorno
   stw r17, 40(sp)
   stw r16, 36(sp)
   stw r15, 32(sp)
@@ -28,13 +28,10 @@ EXCEPTION_TEMP_TIMER:
   stw r10, 12(sp)   
   stw r9, 8(sp)   	
   stw r8, 4(sp)   	
-  stw fp, (sp)     	# guarda o frame pointer
+  stw fp, (sp) # guarda o frame pointer
   mov fp, sp    
 
-	beq r7, r0, EXIT_EXCEPTION_TEMP_TIMER # se r7=0, a contagem está pausada (não fazer nada)
-
-  # essa funcao é chamada a cada 1s, aqui a gnt tem que usar um contador (memória) pra somar +1s e aí mostrar no display de 7seg
-	# o valor total desse contador. 
+	beq r7, r0, EXIT_EXCEPTION_TEMP_TIMER # se r7=0, a contagem está pausada (não fazer nada) 
 
   movia r12, TIMER_COUNTER_BASE # endereço do contador
   movia r17, DISPLAY_7_SEG_BASE1
@@ -45,7 +42,7 @@ EXCEPTION_TEMP_TIMER:
   addi r13, r13, 1 # incrementa o contador
   stw r13, 0(r12) # armazena o novo valor
 
-  # comecaaqui o codigo referecia tirado do triangular
+  # comeca aqui o codigo referecia tirado do triangular
   movi r8, 10
   movi r10, 0
 

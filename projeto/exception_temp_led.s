@@ -26,8 +26,8 @@
 .global EXCEPTION_TEMP_LED
 EXCEPTION_TEMP_LED:
   # prólogo - configurar stack frame
-  addi sp, sp, -44  # stack frame de 32 bytes
-  stw ra, 40(sp)    # guarda o endereço de retorno
+  addi sp, sp, -44 # stack frame de 44 bytes
+  stw ra, 40(sp) # guarda o endereço de retorno
   stw r20, 36(sp)
   stw r12, 32(sp)
   stw r13, 28(sp)
@@ -37,14 +37,14 @@ EXCEPTION_TEMP_LED:
   stw r17, 12(sp)
   stw r18, 8(sp)
   stw r19, 4(sp)
-  stw fp, (sp)     	# guarda o frame pointer
-  mov fp, sp       	# seta o novo frame pointer
+  stw fp, (sp) # guarda o frame pointer
+  mov fp, sp # seta o novo frame pointer
 
 	movia r12, TEMP_STATUS_REGISTER_BASE
   movia r13, ACTIVE_LEDS_BASE
   movia r15, RED_LED_BASE
   movi r14, 0
-  movi r16, 17 #esse valor n deveria ser 16 por causa do intervalo do RED LED ser de 0 a F  ????????
+  movi r16, 17
   movi r20, 17*4 # no vetor ele esta em 4 em 4, por isso precisamos multiplicar por 4
 
   LOOP_LEDS:
@@ -56,7 +56,7 @@ EXCEPTION_TEMP_LED:
     # inverte valor do led
     ldwio r18, 0(r15) # carrega o valor inteiro do RED_LED_BASE
     srl r19, r18, r16 # corta ele {contador} vezes para ele ficar apenas o valor do bit que queremos
-    bne r19, r0, EXIT_LOOP_LEDS # se o valor é != 0, não precisamos fazer nada pois ao mover para direita ele eh 0
+    bne r19, r0, EXIT_LOOP_LEDS # se o valor é != 0, não precisamos fazer nada pois ao mover para direita ele é 0
 
     addi r14, r14, 1 #se o valor é = 0, precisamos acender o led: adicionar 1 no espelho
 
@@ -69,7 +69,7 @@ EXCEPTION_TEMP_LED:
 
   EXIT_TEMP:
     stwio r14, 0(r15) # acender os leds, basicamente colocar o espelho no RED_LED_BASE
-    stwio r0, 0(r12)  # seta o valor de TO no registrador status do temporizador
+    stwio r0, 0(r12) # seta o valor de TO no registrador status do temporizador
 
     # epílogo - limpar stack frame
     ldw ra, 40(sp)
